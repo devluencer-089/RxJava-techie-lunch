@@ -28,7 +28,6 @@ public class WikiExp {
                 .map(this::extractPersonInfoFromPage)
                 .subscribe(System.out::println);
 
-        Thread.sleep(5000);
     }
 
     private String extractFullNamesFromRedirect(Page page) {
