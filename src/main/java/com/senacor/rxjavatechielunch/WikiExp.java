@@ -19,11 +19,10 @@ public class WikiExp {
     }
 
     private void run() throws InterruptedException {
-//        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
+        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
-        Observable<Page> wikiResult = queryWiki("Goethe", "Schiller");
-
-        wikiResult
+        listOfTitleStrings
+                .flatMap(name -> queryWiki(name))
                 .flatMap(this::extractFullNamesFromRedirect)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
@@ -43,6 +42,7 @@ public class WikiExp {
     }
 
     private Observable<Page> queryWiki(String titleString, String... moreTitles) {
+        //TODO windowing
         List<String> titles = new ArrayList<>();
         titles.add(titleString);
         titles.addAll(Arrays.asList(moreTitles));
