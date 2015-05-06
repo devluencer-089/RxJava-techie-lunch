@@ -41,11 +41,9 @@ public class WikiExp {
         return Arrays.stream(currentContent.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
     }
 
-    private Observable<Page> queryWiki(String titleString, String... moreTitles) {
-        //TODO windowing
+    private Observable<Page> queryWiki(String titleString) {
         List<String> titles = new ArrayList<>();
         titles.add(titleString);
-        titles.addAll(Arrays.asList(moreTitles));
         return Observable.from(user.queryContent(titles));
     }
 
