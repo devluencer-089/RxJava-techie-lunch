@@ -22,10 +22,10 @@ public class WikiExp_WithWindowing {
         Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
         listOfTitleStrings
-                .window(50, TimeUnit.MILLISECONDS)
+                .buffer(50, TimeUnit.MILLISECONDS, 10)
                 .flatMap(names -> queryWiki(names))
                 .map(this::extractFullNamesFromRedirect)
-                .window(50, TimeUnit.MILLISECONDS)
+                .buffer(50, TimeUnit.MILLISECONDS, 10)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
                 .subscribe(System.out::println);
@@ -43,9 +43,8 @@ public class WikiExp_WithWindowing {
         return Arrays.stream(currentContent.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
     }
 
-    private Observable<Page> queryWiki(Observable<String> titles) {
-        List<String> titleStrings = titles.toList().toBlocking().first();
-        List<Page> pages = user.queryContent(titleStrings);
+    private Observable<Page> queryWiki(List<String> titles) {
+        List<Page> pages = user.queryContent(titles);
         return Observable.from(pages);
     }
 
