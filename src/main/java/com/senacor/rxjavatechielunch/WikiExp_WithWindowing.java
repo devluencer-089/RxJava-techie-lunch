@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,9 @@ public class WikiExp_WithWindowing {
     }
 
     private Observable<Page> queryWiki(Observable<String> titles) {
-        return Observable.from(user.queryContent(titles.toList().toBlocking().single()));
+        List<String> titleStrings = titles.toList().toBlocking().first();
+        List<Page> pages = user.queryContent(titleStrings);
+        return Observable.from(pages);
     }
 
     public static void main(String[] args) throws InterruptedException {
