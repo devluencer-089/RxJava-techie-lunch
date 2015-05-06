@@ -29,7 +29,13 @@
         <dependency>
             <groupId>io.reactivex</groupId>
             <artifactId>rxjava</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.10</version>
+        </dependency>
+        <dependency>
+
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxjava-async-util</artifactId>
+            <version>0.21.0</version>
         </dependency>
 
         <dependency>
@@ -37,6 +43,19 @@
             <artifactId>bliki-core</artifactId>
             <version>3.0.19</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
 
     </dependencies>
 
