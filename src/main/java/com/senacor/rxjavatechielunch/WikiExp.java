@@ -20,11 +20,10 @@ public class WikiExp {
     }
 
     private void run() throws InterruptedException {
-        List<String> listOfTitleStrings = Arrays.asList("Goethe", "Schiller");
+        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
-        Observable<List<Page>> wikiResult = queryWiki(listOfTitleStrings);
+        Observable<Observable<Page>> wikiResult = queryWiki(listOfTitleStrings);
 
-        //TODO das kann man alles mit Observables machen
         wikiResult
                 .map(this::extractFullNamesFromRedirect)
                 .flatMap(fullNames -> queryWiki(fullNames))
@@ -34,23 +33,19 @@ public class WikiExp {
         Thread.sleep(5000);
     }
 
-    //TODO ReturnType sollte Observbale sein
-    private List<String> extractFullNamesFromRedirect(List<Page> pages) {
-        return  pages.stream()
+    private Observable<String> extractFullNamesFromRedirect(Observable<Page> pages) {
+        return  pages
                 .map(Page::getCurrentContent)
-                .map(s -> StringUtils.substringBetween(s, "[[", "]]"))
-                .collect(Collectors.toList());
+                .map(s -> StringUtils.substringBetween(s, "[[", "]]"));
     }
-    //TODO ReturnType sollte Observbale sein
-    private List<String> extractPersonInfoFromPage(List<Page> pages) {
-        return  pages.stream()
+    private Observable<String> extractPersonInfoFromPage(Observable<Page> pages) {
+        return  pages
                 .map(Page::getCurrentContent)
-                .map(page -> Arrays.stream(page.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" ")))
-                .collect(Collectors.toList());
+                .map(page -> Arrays.stream(page.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" ")));
     }
-    //TODO ReturnType sollte Observbale<Page> sein
-    private Observable<List<Page>> queryWiki(List<String> listOfTitleStrings) {
-        return Async.fromCallable(() -> user.queryContent(listOfTitleStrings));
+
+    private Observable<Observable<Page>> queryWiki(Observable<String> titleStrings) {
+        return Async.fromCallable(() -> Observable.from(user.queryContent(titleStrings.toList().toBlocking().single())));
     }
 
     public static void main(String[] args) throws InterruptedException {
