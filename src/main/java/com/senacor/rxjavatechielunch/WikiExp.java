@@ -23,7 +23,7 @@ public class WikiExp {
 
         listOfTitleStrings
                 .flatMap(name -> queryWiki(name))
-                .flatMap(this::extractFullNamesFromRedirect)
+                .map(this::extractFullNamesFromRedirect)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
                 .subscribe(System.out::println);
@@ -31,9 +31,9 @@ public class WikiExp {
         Thread.sleep(5000);
     }
 
-    private Observable<String> extractFullNamesFromRedirect(Page page) {
+    private String extractFullNamesFromRedirect(Page page) {
         String currentContent = page.getCurrentContent();
-        return Observable.just(StringUtils.substringBetween(currentContent, "[[", "]]"));
+        return StringUtils.substringBetween(currentContent, "[[", "]]");
     }
 
     private String extractPersonInfoFromPage(Page page) {
