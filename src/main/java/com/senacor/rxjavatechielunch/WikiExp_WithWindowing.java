@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class WikiExp_WithWindowinh {
+public class WikiExp_WithWindowing {
     private final User user;
 
-    public WikiExp_WithWindowinh() {
+    public WikiExp_WithWindowing() {
         user = new User("", "", "http://en.wikipedia.org/w/api.php");
         user.login();
     }
@@ -47,6 +47,6 @@ public class WikiExp_WithWindowinh {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new WikiExp_WithWindowinh().run();
+        new WikiExp_WithWindowing().run();
     }
 }
