@@ -4,12 +4,11 @@ import info.bliki.api.Page;
 import info.bliki.api.User;
 import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
-import rx.util.async.Async;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class WikiExp {
     private final User user;
@@ -20,32 +19,34 @@ public class WikiExp {
     }
 
     private void run() throws InterruptedException {
-        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
+//        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
-        Observable<Observable<Page>> wikiResult = queryWiki(listOfTitleStrings);
+        Observable<Page> wikiResult = queryWiki("Goethe", "Schiller");
 
         wikiResult
-                .map(this::extractFullNamesFromRedirect)
-                .flatMap(fullNames -> queryWiki(fullNames))
+                .flatMap(this::extractFullNamesFromRedirect)
+                .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
-                .subscribe(infos -> infos.forEach(System.out::println));
+                .subscribe(System.out::println);
 
         Thread.sleep(5000);
     }
 
-    private Observable<String> extractFullNamesFromRedirect(Observable<Page> pages) {
-        return  pages
-                .map(Page::getCurrentContent)
-                .map(s -> StringUtils.substringBetween(s, "[[", "]]"));
-    }
-    private Observable<String> extractPersonInfoFromPage(Observable<Page> pages) {
-        return  pages
-                .map(Page::getCurrentContent)
-                .map(page -> Arrays.stream(page.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" ")));
+    private Observable<String> extractFullNamesFromRedirect(Page page) {
+        String currentContent = page.getCurrentContent();
+        return Observable.just(StringUtils.substringBetween(currentContent, "[[", "]]"));
     }
 
-    private Observable<Observable<Page>> queryWiki(Observable<String> titleStrings) {
-        return Async.fromCallable(() -> Observable.from(user.queryContent(titleStrings.toList().toBlocking().single())));
+    private String extractPersonInfoFromPage(Page page) {
+        String currentContent = page.getCurrentContent();
+        return Arrays.stream(currentContent.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
+    }
+
+    private Observable<Page> queryWiki(String titleString, String... moreTitles) {
+        List<String> titles = new ArrayList<>();
+        titles.add(titleString);
+        titles.addAll(Arrays.asList(moreTitles));
+        return Observable.from(user.queryContent(titles));
     }
 
     public static void main(String[] args) throws InterruptedException {
