@@ -23,7 +23,7 @@ public class WikiExp_WithWindowing {
         listOfTitleStrings
                 .window(50, TimeUnit.MILLISECONDS)
                 .flatMap(names -> queryWiki(names))
-                .flatMap(this::extractFullNamesFromRedirect)
+                .map(this::extractFullNamesFromRedirect)
                 .window(50, TimeUnit.MILLISECONDS)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
@@ -32,9 +32,9 @@ public class WikiExp_WithWindowing {
         Thread.sleep(5000);
     }
 
-    private Observable<String> extractFullNamesFromRedirect(Page page) {
+    private String extractFullNamesFromRedirect(Page page) {
         String currentContent = page.getCurrentContent();
-        return Observable.just(StringUtils.substringBetween(currentContent, "[[", "]]"));
+        return StringUtils.substringBetween(currentContent, "[[", "]]");
     }
 
     private String extractPersonInfoFromPage(Page page) {
