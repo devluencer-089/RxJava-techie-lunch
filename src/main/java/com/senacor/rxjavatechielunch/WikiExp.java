@@ -23,7 +23,7 @@ public class WikiExp {
         wikiService = this::queryWikiMock;
     }
 
-    private void run() throws InterruptedException {
+    private void run() {
         Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
         listOfTitleStrings
@@ -32,7 +32,6 @@ public class WikiExp {
                 .flatMap(wikiService)
                 .map(this::extractPersonInfoFromPage)
                 .subscribe(System.out::println);
-
     }
 
     private String extractFullNamesFromRedirect(String page) {
@@ -68,7 +67,14 @@ public class WikiExp {
         return Observable.never();
     }
 
+    private static void measureAndPrintTime(Runnable runnable) {
+        long start = System.currentTimeMillis();
+        runnable.run();
+        long end = System.currentTimeMillis();
+        System.out.println("Elapsed time: " + (end - start));
+    }
+
     public static void main(String[] args) throws InterruptedException {
-        new WikiExp().run();
+        measureAndPrintTime(new WikiExp()::run);
     }
 }
