@@ -41,9 +41,7 @@ public class WikiExp {
     }
 
     private Observable<Page> queryWiki(String titleString) {
-        List<String> titles = new ArrayList<>();
-        titles.add(titleString);
-        return Observable.from(user.queryContent(titles));
+        return Observable.from(user.queryContent(Arrays.asList(titleString)));
     }
 
     public static void main(String[] args) throws InterruptedException {
