@@ -20,7 +20,7 @@ public class WikiExp {
         user = new User("", "", "http://en.wikipedia.org/w/api.php");
         user.login();
 
-        wikiService = this::queryWiki;
+        wikiService = this::queryWikiMock;
     }
 
     private void run() throws InterruptedException {
@@ -45,6 +45,27 @@ public class WikiExp {
 
     private Observable<String> queryWiki(String titleString) {
         return Observable.from(user.queryContent(Arrays.asList(titleString))).map(Page::getCurrentContent);
+    }
+
+    private Observable<String> queryWikiMock(String titleString) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (titleString.equals("Goethe")) return Observable.just("REDIRECT [[Johann Wolfgang Goethe]]");
+        if (titleString.equals("Schiller")) return Observable.just("REDIRECT [[Johann Christoph Friedrich Schiller]]");
+
+        if (titleString.equals("Johann Wolfgang Goethe")) return Observable.just(
+                "|birth_date = {{birth date|1749|8|28|df=y}}\\n" +
+                "|birth_place = [[Frankfurt-am-Main]], [[Holy Roman Empire]]\\n");
+        if (titleString.equals("Johann Christoph Friedrich Schiller")) return Observable.just(
+                "|birth_name   = Johann Christoph Friedrich Schiller\\n" +
+                "|birth_date   = {{birth date|1759|11|10|df=y}}\\n" +
+                "|birth_place  = [[Marbach am Neckar]], [[Duchy of Württemberg|Württemberg]], Germany");
+
+        return Observable.never();
     }
 
     public static void main(String[] args) throws InterruptedException {
