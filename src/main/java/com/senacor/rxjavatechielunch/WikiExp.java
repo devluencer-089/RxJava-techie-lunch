@@ -6,10 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WikiExp {
@@ -67,14 +64,7 @@ public class WikiExp {
         return Observable.never();
     }
 
-    private static void measureAndPrintTime(Runnable runnable) {
-        long start = System.currentTimeMillis();
-        runnable.run();
-        long end = System.currentTimeMillis();
-        System.out.println("Elapsed time: " + (end - start));
-    }
-
     public static void main(String[] args) throws InterruptedException {
-        measureAndPrintTime(new WikiExp()::run);
+        StopWatch.measureAndPrintTime(new WikiExp()::run);
     }
 }
