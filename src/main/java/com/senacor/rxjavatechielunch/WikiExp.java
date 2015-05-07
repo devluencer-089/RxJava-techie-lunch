@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class WikiExp {
     private final User user;
-    private final Func1<String, Observable<Page>> wikiService;
+    private final Func1<String, Observable<String>> wikiService;
 
     public WikiExp() {
         user = new User("", "", "http://en.wikipedia.org/w/api.php");
@@ -35,18 +35,16 @@ public class WikiExp {
 
     }
 
-    private String extractFullNamesFromRedirect(Page page) {
-        String currentContent = page.getCurrentContent();
-        return StringUtils.substringBetween(currentContent, "[[", "]]");
+    private String extractFullNamesFromRedirect(String page) {
+        return StringUtils.substringBetween(page, "[[", "]]");
     }
 
-    private String extractPersonInfoFromPage(Page page) {
-        String currentContent = page.getCurrentContent();
-        return Arrays.stream(currentContent.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
+    private String extractPersonInfoFromPage(String page) {
+        return Arrays.stream(page.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
     }
 
-    private Observable<Page> queryWiki(String titleString) {
-        return Observable.from(user.queryContent(Arrays.asList(titleString)));
+    private Observable<String> queryWiki(String titleString) {
+        return Observable.from(user.queryContent(Arrays.asList(titleString))).map(Page::getCurrentContent);
     }
 
     public static void main(String[] args) throws InterruptedException {
