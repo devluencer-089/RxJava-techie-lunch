@@ -17,6 +17,7 @@ public class WikiExp {
         user = new User("", "", "http://en.wikipedia.org/w/api.php");
         user.login();
 
+
         wikiService = this::queryWikiMock;
     }
 
