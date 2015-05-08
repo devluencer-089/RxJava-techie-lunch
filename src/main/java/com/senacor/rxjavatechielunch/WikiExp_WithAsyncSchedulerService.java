@@ -5,7 +5,6 @@ import info.bliki.api.User;
 import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
 import rx.schedulers.Schedulers;
-import rx.util.async.Async;
 
 import java.util.Arrays;
 import java.util.List;
