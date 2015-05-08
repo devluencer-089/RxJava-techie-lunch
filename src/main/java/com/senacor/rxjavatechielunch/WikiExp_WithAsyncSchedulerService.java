@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Created by tkreylin on 08.05.2015.
- */
 public class WikiExp_WithAsyncSchedulerService {
     private final User user;
 
