@@ -22,10 +22,10 @@ public class WikiExp_WithWindowing {
         Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
 
         listOfTitleStrings
-                .buffer(50, TimeUnit.MILLISECONDS, 10)
+                .buffer(500, TimeUnit.MILLISECONDS, 10)
                 .flatMap(names -> queryWiki(names))
                 .map(this::extractFullNamesFromRedirect)
-                .buffer(50, TimeUnit.MILLISECONDS, 10)
+                .buffer(500, TimeUnit.MILLISECONDS, 10)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
                 .subscribe(System.out::println);
@@ -34,16 +34,19 @@ public class WikiExp_WithWindowing {
     }
 
     private String extractFullNamesFromRedirect(Page page) {
+        ThreadTracer.printThreadName();
         String currentContent = page.getCurrentContent();
         return StringUtils.substringBetween(currentContent, "[[", "]]");
     }
 
     private String extractPersonInfoFromPage(Page page) {
+        ThreadTracer.printThreadName();
         String currentContent = page.getCurrentContent();
         return Arrays.stream(currentContent.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
     }
 
     private Observable<Page> queryWiki(List<String> titles) {
+        ThreadTracer.printThreadName();
         List<Page> pages = user.queryContent(titles);
         return Observable.from(pages);
     }

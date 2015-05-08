@@ -36,14 +36,17 @@ public class WikiExp {
     }
 
     private String extractPersonInfoFromPage(String page) {
+        ThreadTracer.printThreadName();
         return Arrays.stream(page.split("\\n")).filter(line -> line.contains("|birth")).collect(Collectors.joining(" "));
     }
 
     private Observable<String> queryWiki(String titleString) {
+        ThreadTracer.printThreadName();
         return Observable.from(user.queryContent(Arrays.asList(titleString))).map(Page::getCurrentContent);
     }
 
     private Observable<String> queryWikiMock(String titleString) {
+        ThreadTracer.printThreadName();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
