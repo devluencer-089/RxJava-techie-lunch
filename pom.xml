@@ -31,8 +31,8 @@
             <artifactId>rxjava</artifactId>
             <version>1.0.10</version>
         </dependency>
-        <dependency>
 
+        <dependency>
             <groupId>io.reactivex</groupId>
             <artifactId>rxjava-async-util</artifactId>
             <version>0.21.0</version>
