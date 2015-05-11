@@ -19,10 +19,15 @@ public class WikiExp_WithWindowing {
     }
 
     private void run() throws InterruptedException {
-        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
+        Observable<String> listOfTitleStrings = Observable.just(
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller"
+                );
 
         listOfTitleStrings
-                .buffer(500, TimeUnit.MILLISECONDS, 10)
+                .buffer(500, TimeUnit.MILLISECONDS)
                 .flatMap(names -> queryWiki(names))
                 .map(this::extractFullNamesFromRedirect)
                 .buffer(500, TimeUnit.MILLISECONDS, 10)

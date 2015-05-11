@@ -4,6 +4,7 @@ import info.bliki.api.Page;
 import info.bliki.api.User;
 import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
+import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
 import java.util.Arrays;
@@ -20,16 +21,39 @@ public class WikiExp_WithWindowing_WithSchedulers {
     }
 
     private void run() throws InterruptedException {
-        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
+        Observable<String> listOfTitleStrings = Observable.from(Arrays.asList(
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller",
+                "Goethe", "Schiller"
+                ));
 
+        Scheduler wikiScheduler = CustomerSchedulers.scheduler("wiki", 10);
         listOfTitleStrings
-                .buffer(500, TimeUnit.MILLISECONDS, 10)
+                .buffer(500, TimeUnit.MILLISECONDS, 5)
+                .observeOn(wikiScheduler)
                 .flatMap(names -> queryWiki(names))
+                .observeOn(Schedulers.computation())
                 .map(this::extractFullNamesFromRedirect)
-                .buffer(500, TimeUnit.MILLISECONDS, 10)
+                .buffer(500, TimeUnit.MILLISECONDS, 5)
+                .observeOn(wikiScheduler)
                 .flatMap(fullName -> queryWiki(fullName))
                 .map(this::extractPersonInfoFromPage)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(System.out::println);
 
         Thread.sleep(5000);

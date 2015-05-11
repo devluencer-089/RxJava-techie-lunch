@@ -4,9 +4,14 @@ import info.bliki.api.Page;
 import info.bliki.api.User;
 import org.apache.commons.lang3.StringUtils;
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class WikiExp {
@@ -17,21 +22,30 @@ public class WikiExp {
         user = new User("", "", "http://en.wikipedia.org/w/api.php");
         user.login();
 
-        wikiService = this::queryWikiMock;
+        wikiService = this::queryWiki;
     }
 
-    private void run() {
-        Observable<String> listOfTitleStrings = Observable.just("Goethe", "Schiller");
+    private void run() throws InterruptedException {
+        Observable<String> listOfTitleStrings = Observable.from(Arrays.asList(
+                "Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller",
+                "Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller",
+                "Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller","Goethe", "Schiller"
+        ));
 
+        Scheduler scheduler = CustomerSchedulers.scheduler("anythread", 20);
         listOfTitleStrings
                 .flatMap(wikiService)
                 .map(this::extractFullNamesFromRedirect)
                 .flatMap(wikiService)
                 .map(this::extractPersonInfoFromPage)
+                .subscribeOn(scheduler)
                 .subscribe(System.out::println);
+
+        Thread.sleep(50000);
     }
 
     private String extractFullNamesFromRedirect(String page) {
+        ThreadTracer.printThreadName();
         return StringUtils.substringBetween(page, "[[", "]]");
     }
 
@@ -42,7 +56,8 @@ public class WikiExp {
 
     private Observable<String> queryWiki(String titleString) {
         ThreadTracer.printThreadName();
-        return Observable.from(user.queryContent(Arrays.asList(titleString))).map(Page::getCurrentContent);
+        List<Page> iterable = user.queryContent(Arrays.asList(titleString));
+        return Observable.from(iterable).map(Page::getCurrentContent);
     }
 
     private Observable<String> queryWikiMock(String titleString) {
@@ -68,6 +83,6 @@ public class WikiExp {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        StopWatch.measureAndPrintTime(new WikiExp()::run);
+        new WikiExp().run();
     }
 }
